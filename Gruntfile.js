@@ -41,10 +41,21 @@ module.exports = function( grunt ) {
 				}
 			}
 		},
+		uglify: {
+			options: {
+				mangle: false
+			},
+			default: {
+				files: {
+					'js/async-img.min.js': ['js/async-img.js']
+				}
+			}
+		}
 	} );
 
 	grunt.loadNpmTasks( 'grunt-wp-i18n' );
 	grunt.loadNpmTasks( 'grunt-wp-readme-to-markdown' );
+	grunt.loadNpmTasks( 'grunt-contrib-uglify' );
 	grunt.registerTask( 'i18n', ['addtextdomain', 'makepot'] );
 	grunt.registerTask( 'readme', ['wp_readme_to_markdown'] );
 

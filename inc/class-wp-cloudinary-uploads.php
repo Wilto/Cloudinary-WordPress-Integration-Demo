@@ -347,7 +347,7 @@ class Cloudinary_WP_Integration {
 					$sizes = apply_filters( 'wp_calculate_image_sizes', $sizes, $size, $src, $image_meta, $attachment_id );
 				}
 
-				$image = preg_replace( '/src="([^"]+)"/', 'src="$1" srcset="' . $srcset . '" sizes="' . $sizes .'"', $image );
+				$image = preg_replace( '/src="([^"]+)"/', 'src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" data-src="$1" data-srcset="' . $srcset . '" sizes="' . $sizes .'"', $image );
 			}
 		}
 

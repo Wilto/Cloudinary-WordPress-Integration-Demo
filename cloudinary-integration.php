@@ -36,3 +36,8 @@ require 'inc/class-wp-cloudinary-uploads.php';
 
 $Cloudinary_WP_Integration = Cloudinary_WP_Integration::get_instance();
 $Cloudinary_WP_Integration->setup();
+
+function ricg_get_asyncimg() {
+	wp_enqueue_script( 'async-img', plugins_url( 'js/async-img.min.js', __FILE__ ), array(), false, true );
+}
+add_action( 'wp_enqueue_scripts', 'ricg_get_asyncimg' );
