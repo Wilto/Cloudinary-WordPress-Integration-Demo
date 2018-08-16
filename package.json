@@ -9,6 +9,8 @@
     "grunt-wp-readme-to-markdown": "~1.0.0"
   },
   "dependencies": {
+    "cloudinary": "^1.11.0",
+    "cloudinary-jquery": "^2.5.0",
     "grunt-contrib-uglify": "^3.4.0"
   }
 }

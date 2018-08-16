@@ -38,6 +38,9 @@ class Cloudinary_WP_Integration {
 		// Replace the default WordPress content filter with our own.
 		remove_filter( 'the_content', 'wp_make_content_images_responsive' );
 		add_filter( 'the_content', array( $this, 'make_content_images_responsive' ) );
+
+		// Replace the default WordPress content filter with our own.
+		add_filter( 'post_thumbnail_html', array( $this, 'make_featured_images_responsive' ) );
 	}
 
 	/**
@@ -58,12 +61,13 @@ class Cloudinary_WP_Integration {
 		// Mirror the image on Cloudinary, and buld custom metadata from the response.
 		if ( $data = $this->handle_upload( $filepath ) ) {
 			$metadata['cloudinary_data'] = array(
-				'public_id'  => $data['public_id'],
-				'width'      => $data['width'],
-				'height'     => $data['height'],
-				'bytes'      => $data['bytes'],
-				'url'        => $data['url'],
-				'secure_url' => $data['secure_url'],
+				'public_id'      => $data['public_id'],
+				'width'          => $data['width'],
+				'height'         => $data['height'],
+				'bytes'          => $data['bytes'],
+				'url'            => $data['url'],
+				'secure_url'     => $data['secure_url'],
+				'transformation' => $data['transformation'],
 			);
 
 			foreach ( $data['responsive_breakpoints'][0]['breakpoints'] as $size ) {
@@ -91,7 +95,7 @@ class Cloudinary_WP_Integration {
 						'create_derived' => false,
 						'bytes_step'		 => 20000,
 						'min_width'			=> 200,
-						'max_width'			=> 1000,
+						'max_width'			=> 1910,
 						'max_images'		 => 20,
 					),
 				),
@@ -254,6 +258,13 @@ class Cloudinary_WP_Integration {
 		if ( isset( $metadata['cloudinary_data']['sizes'] ) ) {
 			$srcset = '';
 
+			if( !isset( $width ) ) {
+				$width = $metadata['cloudinary_data']['width'];
+			}
+			if( !isset( $height ) ) {
+				$height = $metadata['cloudinary_data']['height'];
+			}
+
 			foreach ( $metadata['cloudinary_data']['sizes'] as $s ) {
 				$srcset .= $s['secure_url'] . ' ' . $s['width'] . 'w, ';
 			}
@@ -316,6 +327,19 @@ class Cloudinary_WP_Integration {
 		return $content;
 	}
 
+		/**
+	 * Filter images in post content to use Cloudinary URLs.
+	 *
+	 * @param string Post content.
+	 * @return string Fitlered content.
+	 */
+	public function make_featured_images_responsive( $content ) {
+		$attachment_id = get_post_thumbnail_id();
+		$image_meta = wp_get_attachment_metadata( $attachment_id );
+
+		return $this->add_srcset_and_sizes( $content, $image_meta, $attachment_id );
+	}
+
 	/**
 	 * Adds 'srcset' and 'sizes' attributes to an image.
 	 *
@@ -327,15 +351,17 @@ class Cloudinary_WP_Integration {
 	public function add_srcset_and_sizes( $image, $image_meta, $attachment_id ) {
 		if ( isset( $image_meta['cloudinary_data']['sizes'] ) ) {
 			// See if our filename is in the URL string.
-			if ( false !== strpos( $image, wp_basename( $image_meta['cloudinary_data']['url'] ) ) && false === strpos( $image, 'c_lfill' ) ) {
+			if ( false !== strpos( $image, wp_basename( $image_meta['cloudinary_data']['url'] ) ) ) {
+				//TODO: Is `&& false === strpos( $image, 'c_lfill' )` required here?
 				$src = preg_match( '/src="([^"]+)"/', $image, $match_src ) ? $match_src[1] : '';
 				$width  = preg_match( '/ width="([0-9]+)"/',  $image, $match_width ) ? (int) $match_width[1]  : 0;
 				$height = preg_match( '/ height="([0-9]+)"/', $image, $match_height ) ? (int) $match_height[1] : 0;
+				$options = $image_meta['cloudinary_data']['transformation'];
 
 				$srcset = '';
 
 				foreach ( $image_meta['cloudinary_data']['sizes'] as $s ) {
-					$srcset .= $s['secure_url'] . ' ' . $s['width'] .  'w, ';
+					$srcset .= cloudinary_url( $image_meta['cloudinary_data']['public_id'], $options ) . ' ' . $s['width'] .  'w, ';
 				}
 
 				if ( ! empty( $srcset ) ) {

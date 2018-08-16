@@ -1,0 +1,28 @@
+.smart-crop-thumbs-container {
+	list-style: none;
+	margin: 20px 0;
+	padding: 0;
+}
+
+.smart-crop-thumbs-container li {
+	padding: 0;
+	margin: 0 0 20px;
+}
+
+.smart-crop-thumbs-container img {
+	display: block;
+	max-width: 100%;
+}
+
+.wp-core-ui .attachment-actions input[type="button"] {
+	margin: 0 0 0 5px;
+}
+
+.wp-core-ui .attachment-actions .spinner {
+	float: none;
+}
+
+.thumbnail-image .details-image.select-focal-point {
+	cursor: crosshair;
+	box-shadow: 0 0 1px 1px #fff, 0 0 5px 3px rgba(0,115,170,.8);
+}
