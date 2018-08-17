@@ -378,6 +378,7 @@ class Cloudinary {
 				if ( $resource_type == 'subtitles' ) {
 					$text_style = Cloudinary::text_style( $layer, $layer_parameter );
 				}
+
 			} else {
 				$resource_type = 'text';
 				$type          = null; // type is ignored for text layers

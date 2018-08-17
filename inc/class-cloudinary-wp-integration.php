@@ -50,10 +50,6 @@ class Cloudinary_WP_Integration {
 	 * @return array The filtered metadata.
 	 */
 	public function generate_cloudinary_data( $metadata ) {
-		$data;
-		$uploads;
-		$filepath;
-
 		// Bail early if we don't have a file path to work with.
 		if ( ! isset( $metadata['file'] ) ) {
 			return $metadata;
@@ -63,7 +59,8 @@ class Cloudinary_WP_Integration {
 		$filepath = trailingslashit( $uploads['basedir'] ) . $metadata['file'];
 
 		// Mirror the image on Cloudinary, and buld custom metadata from the response.
-		if ( $data = $this->handle_upload( $filepath ) ) {
+		$data = $this->handle_upload( $filepath );
+		if ( null !== $data ) {
 			$metadata['cloudinary_data'] = array(
 				'public_id'      => $data['public_id'],
 				'width'          => $data['width'],
@@ -197,9 +194,7 @@ class Cloudinary_WP_Integration {
 
 		$sizes = array();
 
-		print_r( esc_html( $_wp_additional_image_sizes ) );
-
-		foreach ( get_intermediate_image_sizes() as $s ) {
+		foreach ( \PMC\Image\get_intermediate_image_sizes() as $s ) {
 			// Skip over sizes we're not returning.
 			if ( $size && $size !== $s ) {
 				continue;
@@ -246,14 +241,14 @@ class Cloudinary_WP_Integration {
 	 * @return array Filtered attributes for the image markup.
 	 */
 	public function wp_get_attachment_image_attributes( $attr, $attachment, $size ) {
-		$data;
 		$metadata = wp_get_attachment_metadata( $attachment->ID );
+		$data     = $this->get_wordpress_image_size_data( $size );
 
 		if ( is_string( $size ) ) {
 			if ( 'full' === $size ) {
 				$width  = $attachment['width'];
 				$height = $attachment['height'];
-			} elseif ( $data = $this->get_wordpress_image_size_data( $size ) ) {
+			} elseif ( null !== $data ) {
 				// Bail early if this is a cropped image size.
 				if ( $data[ $size ]['crop'] ) {
 					return $attr;
@@ -304,11 +299,12 @@ class Cloudinary_WP_Integration {
 			return $content;
 		}
 
-		$selected_images = $attachment_ids = array();
+		$attachment_ids  = array();
+		$selected_images = array();
 
 		foreach ( $matches[0] as $image ) {
-			if ( false === strpos( $image, ' srcset=' ) && preg_match( '/wp-image-([0-9]+)/i', $image, $class_id ) &&
-				( $attachment_id = absint( $class_id[1] ) ) ) {
+			$attachment_id = absint( $class_id[1] );
+			if ( false === strpos( $image, ' srcset=' ) && preg_match( '/wp-image-([0-9]+)/i', $image, $class_id ) && null !== $attachment_id ) {
 
 				/*
 				 * If exactly the same image tag is used more than once, overwrite it.
