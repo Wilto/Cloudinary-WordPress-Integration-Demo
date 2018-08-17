@@ -4,10 +4,10 @@ class Cloudinary_Smartcrops {
 	private static $instance;
 
 	public static function get_instance() {
-	if ( ! self::$instance ) {
-	  self::$instance = new self();
-	}
-	return self::$instance;
+		if ( ! self::$instance ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
 	}
 
 	private function __construct() {
@@ -36,7 +36,7 @@ class Cloudinary_Smartcrops {
 		$form_fields['smart_crops'] = array(
 			'label' => __( 'Smart Crops', 'smartcrops' ),
 			'input' => 'html',
-			'html' => $this->get_attachment_field_html( $attachment )
+			'html'  => $this->get_attachment_field_html( $attachment ),
 		);
 
 		return $form_fields;
@@ -50,8 +50,8 @@ class Cloudinary_Smartcrops {
 	 */
 	public function get_attachment_field_html( $attachment ) {
 		global $_wp_additional_image_sizes;
-		$sizes = $_wp_additional_image_sizes;
-		$image = wp_get_attachment_image_src( $attachment->ID, 'full' );
+		$sizes    = $_wp_additional_image_sizes;
+		$image    = wp_get_attachment_image_src( $attachment->ID, 'full' );
 		$metadata = wp_get_attachment_metadata( $attachment_id );
 
 		if ( empty( $image ) ) {
@@ -78,7 +78,7 @@ class Cloudinary_Smartcrops {
 		$src = str_replace( ' ', '%20', $src );
 
 		// Generate the HTML output.
-		$html = '<p class="hide-if-js">' . __( 'You need to enable Javascript to use this functionality.' ) . '</p>';
+		$html  = '<p class="hide-if-js">' . __( 'You need to enable Javascript to use this functionality.' ) . '</p>';
 		$html .= '<input type="button" class="hide-if-no-js button" data-show-thumbnails value="' . __( 'Open Cropping Tools' ) . '" />';
 		$html .= '<input type="button" class="hide-if-no-js button hidden" data-use-smart-crop value="' . __( 'Use Smart Crop' ) . '" />';
 		$html .= '<input type="button" class="hide-if-no-js button hidden" data-select-focal-point value="' . __( 'Select Focal Point' ) . '" />';
@@ -97,7 +97,7 @@ class Cloudinary_Smartcrops {
 
 			$html .= '<li>';
 			$html .= '<strong>' . esc_html( $image_name ) . '</strong><br />';
-			$html .= '<img src="' . esc_url( $thumbnail_url ) . '" alt="' . esc_attr( $image_name ) . '" data-cloudinary="' . $metadata["cloudinary_data"]["public_id"] . '" />';
+			$html .= '<img src="' . esc_url( $thumbnail_url ) . '" alt="' . esc_attr( $image_name ) . '" data-cloudinary="' . $metadata['cloudinary_data']['public_id'] . '" />';
 			$html .= '</li>';
 		}
 		$html .= '</ul>';
@@ -121,10 +121,10 @@ class Cloudinary_Smartcrops {
 		$state = $this->validate_ajax_smart_crop_state();
 
 		// Update attachment metadata.
-		$metadata                      = wp_get_attachment_metadata( $id );
+		$metadata = wp_get_attachment_metadata( $id );
 		$metadata['cloudinary_data']['enable_smart_crop'] = $state;
 
-		print( "Smart crop state: " . $state );
+		print( esc_html( 'Smart crop state: ' . $state ) );
 
 		unset( $metadata['cloudinary_data']['focal_point_offset_left'] );
 		unset( $metadata['cloudinary_data']['focal_point_offset_top'] );
